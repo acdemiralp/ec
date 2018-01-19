@@ -16,6 +16,9 @@ set(PROJECT_SOURCES
   include/ec/component.hpp
   include/ec/entity.hpp
   include/ec/system.hpp
+
+  readme.md
+  license.txt
 )
 include(assign_source_group)
 assign_source_group(${PROJECT_SOURCES})
