@@ -13,9 +13,8 @@ set(PROJECT_SOURCES
   cmake/assign_source_group.cmake
   cmake/import_library.cmake
   
-  include/ec/component.hpp
-  include/ec/entity.hpp
   include/ec/system.hpp
+  include/ec/table.hpp
 
   readme.md
   license.txt
@@ -48,9 +47,8 @@ if(BUILD_TESTS)
   enable_testing()
 
   set(PROJECT_TEST_SOURCES
-    tests/component_test.cpp
-    tests/entity_test.cpp
     tests/system_test.cpp
+    tests/table_test.cpp
   )
 
   foreach(_SOURCE ${PROJECT_TEST_SOURCES})
