@@ -34,6 +34,32 @@
 - `renderer<component_key<camera, transform>, component_key<light, transform>, component_key<mesh, transform>>`
 - `ui_system<component_key<button, collider, transform>>`
 
+**Implementation**
+
+The ec-table must be in such a form that it is trivial to:
+- Insert or remove an entity (row).
+- Iterate through all entities (rows).
+- Iterate through all entities (rows) containing one or more component types (columns).
+
+Until now, a `std::vector<std::tuple<types...>>` would suffice but in addition, the following should also be efficient:
+- Query an entity's components        (select row  , given row index).
+- Query an entity's component by type (select entry, given row index and column type).
+- Query a component's entity          (select row  , given entry).
+
+The issue is when allowing row insertion/removal from the middle, the index cannot be relied upon for access to the entities. 
+Instead it is possible to hold a component for entity metadata (e.g. id, name) and query by the equivalence of it. This requires 
+a search for entity (`std::find_if`). 
+
+An alternative is to use an associative container: `std::unordered_map<std::size_t, std::tuple<types...>>`
+
+The systems do not necessarily derive from a common interface and only need to hold:
+- A pointer to the ec-table they are processing.
+- A set of typedefs consisting of one or more component types to query the ec-table with.
+
+**Limitations**
+
+- An entity can only have one of each component type since multiple identical types are not allowed in the ec-table.
+
 **TODO**
 
 Find a better way to create systems which require more than one key.
