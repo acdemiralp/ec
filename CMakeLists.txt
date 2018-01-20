@@ -13,7 +13,6 @@ set(PROJECT_SOURCES
   cmake/assign_source_group.cmake
   cmake/import_library.cmake
   
-  include/ec/system.hpp
   include/ec/table.hpp
 
   readme.md
@@ -47,7 +46,6 @@ if(BUILD_TESTS)
   enable_testing()
 
   set(PROJECT_TEST_SOURCES
-    tests/system_test.cpp
     tests/table_test.cpp
   )
 
