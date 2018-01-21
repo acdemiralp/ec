@@ -1,5 +1,5 @@
 ##################################################    Project     ##################################################
-cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project               (ec VERSION 1.0 LANGUAGES CXX)
 list                  (APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set_property          (GLOBAL PROPERTY USE_FOLDERS ON)
@@ -40,6 +40,8 @@ target_include_directories(${PROJECT_NAME}_
 target_include_directories(${PROJECT_NAME}_ PUBLIC ${PROJECT_INCLUDE_DIRS})
 target_link_libraries     (${PROJECT_NAME}_ PUBLIC ${PROJECT_LIBRARIES})
 set_target_properties     (${PROJECT_NAME}_ PROPERTIES LINKER_LANGUAGE CXX)
+set_property              (TARGET ${PROJECT_NAME}_ PROPERTY CXX_STANDARD 17)
+set_property              (TARGET ${PROJECT_NAME}_ PROPERTY CXX_STANDARD_REQUIRED ON)
 
 ##################################################    Testing     ##################################################
 if(BUILD_TESTS)
