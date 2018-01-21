@@ -15,7 +15,8 @@
 - What is a system?
   - A system regularly traverses an ec-table, and processes the components relevant to it.
   - Systems use compile-time defined keys to select relevant entities in an ec-table.
-  - A key consists of one or more component types (columns), which have to be existent on an entity (row) for the system to be able to process it. One can think of keys as the component requirements of a system.
+  - A key consists of one or more component types (columns), which have to be existent on an entity (row) for the system to be able to process it. 
+  One can think of keys as the component requirements of a system.
 
 **Example ec-table**
 
