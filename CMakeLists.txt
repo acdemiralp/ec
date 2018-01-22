@@ -13,6 +13,7 @@ set(PROJECT_SOURCES
   cmake/assign_source_group.cmake
   cmake/import_library.cmake
   
+  include/ec/entity.hpp
   include/ec/table.hpp
 
   readme.md
