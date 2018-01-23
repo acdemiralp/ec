@@ -32,6 +32,15 @@ public:
     return id_ != that.id_;
   }
 
+  const std::size_t&                  id               () const
+  {
+    return id_;
+  }
+  const std::bitset<component_count>& components_bitset() const
+  {
+    return components_bitset_;
+  }
+
 protected:
   friend std::hash<entity<component_count>>;
 
@@ -42,13 +51,13 @@ protected:
 
 namespace std
 {
-template<std::size_t component_count>
+template<size_t component_count>
 struct hash<ec::entity<component_count>>
 {
   size_t operator() (const ec::entity<component_count>& that) const
   {
     size_t seed = 0;
-    boost::hash_combine(seed, std::hash<std::size_t>{}(that.id_));
+    boost::hash_combine(seed, hash<size_t>{}(that.id_));
     boost::hash_combine(seed, that.components_bitset_.hash());
     return seed;
   }
