@@ -2,13 +2,14 @@
 #define EC_ENTITY_HPP_
 
 #include <cstddef>
+#include <bitset>
 #include <functional>
 
-#include <boost/dynamic_bitset.hpp>
 #include <boost/functional/hash.hpp>
 
 namespace ec
 {
+template<std::size_t component_count>
 class entity
 {
 public:
@@ -32,23 +33,23 @@ public:
   }
 
 protected:
-  friend std::hash<ec::entity>;
+  friend std::hash<entity<component_count>>;
 
-  std::size_t              id_               ;
-  boost::dynamic_bitset<>  components_bitset_;
+  std::size_t                  id_               ;
+  std::bitset<component_count> components_bitset_;
 };
 }
 
 namespace std
 {
-template<>
-struct hash<ec::entity>
+template<std::size_t component_count>
+struct hash<ec::entity<component_count>>
 {
-  size_t operator() (const ec::entity& that) const
+  size_t operator() (const ec::entity<component_count>& that) const
   {
     size_t seed = 0;
-    boost::hash_combine(seed, boost::hash_value(that.id_));
-    boost::hash_combine(seed, boost::hash_value(that.components_bitset_));
+    boost::hash_combine(seed, std::hash<std::size_t>{}(that.id_));
+    boost::hash_combine(seed, that.components_bitset_.hash());
     return seed;
   }
 };

@@ -24,8 +24,8 @@ public:
   */
 
 protected:
-  std::size_t                                                                    next_id_ = 0;
-  std::unordered_map<std::size_t, std::tuple<std::optional<component_types>...>> entities_;
+  std::size_t                                                                                           next_id_ = 0;
+  std::unordered_map<entity<sizeof...(component_types)>, std::tuple<std::optional<component_types>...>> entities_;
 };
 }
 
