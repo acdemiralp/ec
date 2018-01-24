@@ -29,6 +29,16 @@ public:
     entities_.erase(entity);
   }
 
+  std::vector<entity> entities() const
+  {
+    std::vector<entity> entities(entities_.size());
+    std::transform(entities_.begin(), entities_.end(), entities.begin(), [ ] (const std::pair<entity, components>& iteratee)
+    {
+      return iteratee.first;
+    });
+    return entities;
+  }
+
   /*
   - Insert or remove an entity (row).
   - Insert or remove a component to or from an entity.
@@ -37,6 +47,27 @@ public:
   - Query an entity's components        (select row  , given row index).
   - Query an entity's component by type (select entry, given row index and column type).
   - Query a component's entity          (select row  , given entry).
+
+  - Entity
+    - Create           (table )
+    - Delete           (table )
+    - Iterate          (table )
+    - Filtered Iterate (table )
+    - Has Component    (entity)
+    - Has Components   (entity)
+    - Get Scene        (entity)
+
+  - Component
+    - Create           (entity)
+    - Delete           (entity)
+    - Get              (entity)
+    - Get Entity       (requires inheritance)
+
+  - Table is the scene since it provides access/mutation of entities.
+  - Systems    are inherent.
+  - Components are inherent (unless get entity is needed).
+  - Engine is out of scope.
+  - Only implement entity and table, providing the functionality above.
   */
 
 protected:

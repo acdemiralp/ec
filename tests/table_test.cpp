@@ -5,7 +5,8 @@
 TEST_CASE("Table test.", "[table]")
 {
   ec::table<int, long, float, double> table;
-  auto e1 = table.create_entity();
-  auto e2 = table.create_entity();
-  table.remove_entity(e2);
+  auto entity_1 = table.create_entity();
+  auto entity_2 = table.create_entity();
+  auto entities = table.entities     ();
+  table.delete_entity(entity_2);
 }
