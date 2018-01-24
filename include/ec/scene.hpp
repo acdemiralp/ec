@@ -51,6 +51,8 @@ public:
   }
 
 protected:
+  friend entity<types...>;
+
   std::unordered_map<entity_type, components_type> entities_;
 };
 }
