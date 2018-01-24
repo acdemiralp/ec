@@ -13,9 +13,20 @@ template <typename... component_types>
 class table
 {
 public:
-  entity<sizeof...(component_types)> create_entity()
+  static const std::size_t component_count = sizeof...(component_types);
+
+  using entity         = entity<component_count>;
+  using components     = std::tuple<std::optional<component_types>...>;
+  using iterator       = typename std::unordered_map<entity, components>::iterator;
+  using const_iterator = typename std::unordered_map<entity, components>::const_iterator;
+
+  entity create_entity()
   {
     return entities_.emplace().first->first;
+  }
+  void   delete_entity(const entity& entity)
+  {
+    entities_.erase(entity);
   }
 
   /*
@@ -29,7 +40,7 @@ public:
   */
 
 protected:
-  std::unordered_map<entity<sizeof...(component_types)>, std::tuple<std::optional<component_types>...>> entities_;
+  std::unordered_map<entity, components> entities_;
 };
 }
 
