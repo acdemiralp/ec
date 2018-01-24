@@ -18,8 +18,10 @@ class entity
 public:
   using component_types = boost::mp11::mp_list<types...>;
   using component_count = boost::mp11::mp_size<component_types>;
+  using bitset_type     = std::bitset<component_count::value>;
+  using scene_type      = scene<entity<types...>>;
 
-  explicit entity   (scene<entity<types...>>* table) : table_(table)
+  explicit entity   (scene_type* scene) : scene_(scene)
   {
     static std::size_t next_id = 0;
     id_ = next_id++;
@@ -38,21 +40,21 @@ public:
     return id_ != that.id_;
   }
 
-  scene<entity<types...>>*                                table            () const
+  scene_type*        scene            () const
   {
-    return table_;
+    return scene_;
   }
-  const std::size_t&                         id               () const
+  const std::size_t& id               () const
   {
     return id_;
   }
-  const std::bitset<component_count::value>& components_bitset() const
+  const bitset_type& components_bitset() const
   {
     return components_bitset_;
   }
 
   template<typename... required_types>
-  bool has_components() const
+  bool               has_components   () const
   {
     using required_component_types   = boost::mp11::mp_list<required_types...>;
     using required_component_size    = boost::mp11::mp_size<required_component_types>;
@@ -65,15 +67,10 @@ public:
       if (!components_bitset_[component_index::value])
         valid = false;
     });
-
     return valid;
   }
 
   /*
-  - Entity
-  - Has Component  (entity)
-  - Has Components (entity)
-
   - Component
   - Create         (entity)
   - Delete         (entity)
@@ -81,13 +78,9 @@ public:
   */
 
 protected:
-  friend std::hash<entity<types...>>;
-
-  using entity_type = entity<types...>;
-
-  ec::scene<entity<types...>>*            table_            ;
-  std::size_t                         id_               ;
-  std::bitset<component_count::value> components_bitset_;
+  scene_type* scene_            ;
+  std::size_t id_               ;
+  bitset_type components_bitset_;
 };
 }
 
@@ -99,8 +92,9 @@ struct hash<ec::entity<types...>>
   size_t operator() (const ec::entity<types...>& that) const
   {
     size_t seed = 0;
-    boost::hash_combine(seed, hash<size_t>                                              {}(that.id_));
-    boost::hash_combine(seed, hash<bitset<ec::entity<types...>::component_count::value>>{}(that.components_bitset_));
+    boost::hash_combine(seed, hash<typename ec::entity<types...>::scene_type*>{}(that.scene            ()));
+    boost::hash_combine(seed, hash<size_t>                                    {}(that.id               ()));
+    boost::hash_combine(seed, hash<typename ec::entity<types...>::bitset_type>{}(that.components_bitset()));
     return seed;
   }
 };
