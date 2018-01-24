@@ -5,35 +5,25 @@
 #include <optional>
 #include <tuple>
 #include <unordered_map>
-#include <utility>
 #include <vector>
-
-#include <boost/mp11.hpp>
-
-#include <ec/entity.hpp>
 
 namespace ec
 {
-template <typename... types>
+template <typename entity_type>
 class table
 {
 public:
-  using entity            = entity<table<types...>>;
-  using component_types   = boost::mp11::mp_list<types...>;
-  using component_count   = boost::mp11::mp_size<component_types>;
-  using component_storage = std::tuple<std::optional<types>...>;
-
-  entity              create_entity()
+  entity_type              create_entity()
   {
-    return entities_.emplace(entity(this), component_storage()).first->first;
+    return entities_.emplace(entity_type(this), std::tuple<std::optional<typename entity_type::component_types>...>()).first->first;
   }
-  void                delete_entity(const entity& entity)
+  void                     delete_entity(const entity_type& entity)
   {
     entities_.erase(entity);
   }
-  std::vector<entity> entities     () const
+  std::vector<entity_type> entities     () const
   {
-    std::vector<entity> entities;
+    std::vector<entity_type> entities;
     std::transform(entities_.begin(), entities_.end(), std::back_inserter(entities), [ ] (const auto& iteratee)
     {
       return iteratee.first;
@@ -41,32 +31,19 @@ public:
     return entities;
   }
   template<typename... required_types>
-  std::vector<entity> entities     () const
+  std::vector<entity_type> entities     () const
   {
-    using required_component_types   = boost::mp11::mp_list<required_types...>;
-    using required_component_size    = boost::mp11::mp_size<required_component_types>;
-    using required_component_indices = boost::mp11::mp_iota_c<required_component_size::value>;
-
-    std::vector<entity> entities;
+    std::vector<entity_type> entities;
     std::for_each(entities_.begin(), entities_.end(), [&entities] (const auto& iteratee)
     {
-      auto valid = true;
-
-      boost::mp11::mp_for_each<required_component_indices>([&iteratee, &valid] (const auto index)
-      {
-        using component_index = boost::mp11::mp_find<component_types, boost::mp11::mp_nth_element_c<required_component_types, index, std::less>>;
-        if (!iteratee.first.components_bitset()[component_index::value])
-          valid = false;
-      });
-
-      if(valid)
+      if(iteratee.first.has_components<required_types...>())
         entities.push_back(iteratee.first);
     });
     return entities;
   }
 
 protected:
-  std::unordered_map<entity, component_storage> entities_;
+  std::unordered_map<entity_type, std::tuple<std::optional<typename entity_type::component_types>...>> entities_;
 };
 }
 
