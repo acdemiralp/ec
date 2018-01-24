@@ -9,11 +9,11 @@
 
 namespace ec
 {
-template<std::size_t component_count>
+template<typename table_type>
 class entity
 {
 public:
-  entity            ()
+  explicit entity   (table_type* table) : table_(table)
   {
     static std::size_t next_id = 0;
     id_ = next_id++;
@@ -32,33 +32,34 @@ public:
     return id_ != that.id_;
   }
 
-  const std::size_t&                  id               () const
+  const std::size_t&                                     id               () const
   {
     return id_;
   }
-  const std::bitset<component_count>& components_bitset() const
+  const std::bitset<table_type::component_count::value>& components_bitset() const
   {
     return components_bitset_;
   }
 
 protected:
-  friend std::hash<entity<component_count>>;
+  friend std::hash<entity<table_type>>;
 
-  std::size_t                  id_               ;
-  std::bitset<component_count> components_bitset_;
+  table_type*                                     table_            ;
+  std::size_t                                     id_               ;
+  std::bitset<table_type::component_count::value> components_bitset_;
 };
 }
 
 namespace std
 {
-template<size_t component_count>
-struct hash<ec::entity<component_count>>
+template<typename table_type>
+struct hash<ec::entity<table_type>>
 {
-  size_t operator() (const ec::entity<component_count>& that) const
+  size_t operator() (const ec::entity<table_type>& that) const
   {
     size_t seed = 0;
-    boost::hash_combine(seed, hash<size_t>{}(that.id_));
-    boost::hash_combine(seed, that.components_bitset_.hash());
+    boost::hash_combine(seed, hash<size_t>                                    {}(that.id_));
+    boost::hash_combine(seed, hash<bitset<table_type::component_count::value>>{}(that.components_bitset_));
     return seed;
   }
 };

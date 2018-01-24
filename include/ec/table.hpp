@@ -5,73 +5,77 @@
 #include <unordered_map>
 #include <utility>
 
+#include <boost/mp11.hpp>
+
 #include <ec/entity.hpp>
 
 namespace ec
 {
-template <typename... component_types>
+template <typename... types>
 class table
 {
 public:
-  static const std::size_t component_count = sizeof...(component_types);
+  using component_types   = boost::mp11::mp_list<types...>;
+  using component_count   = boost::mp11::mp_size<component_types>;
+  using component_storage = std::tuple<std::optional<types>...>;
+  using entity_type       = entity<table<types...>>;
 
-  using entity         = entity<component_count>;
-  using components     = std::tuple<std::optional<component_types>...>;
-  using iterator       = typename std::unordered_map<entity, components>::iterator;
-  using const_iterator = typename std::unordered_map<entity, components>::const_iterator;
-
-  entity create_entity()
+  entity_type              create_entity()
   {
-    return entities_.emplace().first->first;
+    return entities_.emplace(entity_type(this), component_storage{1, std::nullopt, std::nullopt, std::nullopt}).first->first;
   }
-  void   delete_entity(const entity& entity)
+  void                     delete_entity(const entity_type& entity)
   {
     entities_.erase(entity);
   }
-
-  std::vector<entity> entities() const
+  std::vector<entity_type> entities     () const
   {
-    std::vector<entity> entities(entities_.size());
-    std::transform(entities_.begin(), entities_.end(), entities.begin(), [ ] (const std::pair<entity, components>& iteratee)
+    std::vector<entity_type> entities;
+    std::transform(entities_.begin(), entities_.end(), std::back_inserter(entities), [ ] (const auto& iteratee)
     {
       return iteratee.first;
     });
     return entities;
   }
+  template<typename... required_types>
+  std::vector<entity_type> entities     () const
+  {
+    using required_component_types   = boost::mp11::mp_list<required_types...>;
+    using required_component_size    = boost::mp11::mp_size<required_component_types>;
+    using required_component_indices = boost::mp11::mp_iota_c<required_component_size::value>;
+
+    std::vector<entity_type> entities;
+    std::for_each(entities_.begin(), entities_.end(), [&entities] (const auto& iteratee)
+    {
+      auto valid = true;
+
+      boost::mp11::mp_for_each<required_component_indices>([&] (auto index)
+      {
+        using component_index = boost::mp11::mp_find<component_types, boost::mp11::mp_nth_element_c<required_component_types, index, std::less>>;
+        if (!iteratee.first.components_bitset()[component_index::value])
+          valid = false;
+      });
+
+      if(valid)
+        entities.push_back(iteratee.first);
+    });
+    return entities;
+  }
 
   /*
-  - Insert or remove an entity (row).
-  - Insert or remove a component to or from an entity.
-  - Iterate through all entities (rows).
-  - Iterate through all entities (rows) containing one or more component types (columns).
-  - Query an entity's components        (select row  , given row index).
-  - Query an entity's component by type (select entry, given row index and column type).
-  - Query a component's entity          (select row  , given entry).
-
   - Entity
-    - Create           (table )
-    - Delete           (table )
-    - Iterate          (table )
-    - Filtered Iterate (table )
-    - Has Component    (entity)
-    - Has Components   (entity)
-    - Get Scene        (entity)
-
-  - Component
-    - Create           (entity)
-    - Delete           (entity)
-    - Get              (entity)
-    - Get Entity       (requires inheritance)
-
-  - Table is the scene since it provides access/mutation of entities.
-  - Systems    are inherent.
-  - Components are inherent (unless get entity is needed).
-  - Engine is out of scope.
-  - Only implement entity and table, providing the functionality above.
+    - Has Component  (entity)
+    - Has Components (entity)
+    - Get Scene      (entity)
+                     
+  - Component        
+    - Create         (entity)
+    - Delete         (entity)
+    - Get            (entity)
   */
 
 protected:
-  std::unordered_map<entity, components> entities_;
+  std::unordered_map<entity_type, component_storage> entities_;
 };
 }
 
