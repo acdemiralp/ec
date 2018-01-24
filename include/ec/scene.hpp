@@ -1,5 +1,5 @@
-#ifndef EC_TABLE_HPP_
-#define EC_TABLE_HPP_
+#ifndef EC_SCENE_HPP_
+#define EC_SCENE_HPP_
 
 #include <algorithm>
 #include <optional>
@@ -9,15 +9,23 @@
 
 namespace ec
 {
-template <typename entity_type>
-class table
+template<typename... types>
+class entity;
+
+template<typename type>
+class scene;
+template<typename... types>
+class scene<entity<types...>>
 {
 public:
-  entity_type              create_entity()
+  using entity_type     = entity<types...>;
+  using components_type = std::tuple<std::optional<types>...>;
+
+  entity_type              add_entity   ()
   {
-    return entities_.emplace(entity_type(this), std::tuple<std::optional<typename entity_type::component_types>...>()).first->first;
+    return entities_.emplace(entity_type(this), components_type()).first->first;
   }
-  void                     delete_entity(const entity_type& entity)
+  void                     remove_entity(const entity_type& entity)
   {
     entities_.erase(entity);
   }
@@ -43,7 +51,7 @@ public:
   }
 
 protected:
-  std::unordered_map<entity_type, std::tuple<std::optional<typename entity_type::component_types>...>> entities_;
+  std::unordered_map<entity_type, components_type> entities_;
 };
 }
 

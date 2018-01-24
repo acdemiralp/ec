@@ -8,7 +8,7 @@
 #include <boost/functional/hash.hpp>
 #include <boost/mp11.hpp>
 
-#include <ec/table.hpp>
+#include <ec/scene.hpp>
 
 namespace ec
 {
@@ -19,7 +19,7 @@ public:
   using component_types = boost::mp11::mp_list<types...>;
   using component_count = boost::mp11::mp_size<component_types>;
 
-  explicit entity   (table<entity<types...>>* table) : table_(table)
+  explicit entity   (scene<entity<types...>>* table) : table_(table)
   {
     static std::size_t next_id = 0;
     id_ = next_id++;
@@ -38,7 +38,7 @@ public:
     return id_ != that.id_;
   }
 
-  table<entity<types...>>*                                table            () const
+  scene<entity<types...>>*                                table            () const
   {
     return table_;
   }
@@ -85,7 +85,7 @@ protected:
 
   using entity_type = entity<types...>;
 
-  ec::table<float>*            table_            ;
+  ec::scene<entity<types...>>*            table_            ;
   std::size_t                         id_               ;
   std::bitset<component_count::value> components_bitset_;
 };

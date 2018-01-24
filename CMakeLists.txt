@@ -14,7 +14,7 @@ set(PROJECT_SOURCES
   cmake/import_library.cmake
   
   include/ec/entity.hpp
-  include/ec/table.hpp
+  include/ec/scene.hpp
 
   readme.md
   license.txt
@@ -52,7 +52,7 @@ if(BUILD_TESTS)
   enable_testing()
 
   set(PROJECT_TEST_SOURCES
-    tests/table_test.cpp
+    tests/scene_test.cpp
   )
 
   foreach(_SOURCE ${PROJECT_TEST_SOURCES})
