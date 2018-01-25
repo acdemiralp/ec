@@ -48,11 +48,7 @@ public:
   {
     return id_;
   }
-  const bitset_type&             bitset          () const
-  {
-    return bitset_;
-  }
-
+  
   template<typename... required_types>
   bool                           has_components  () const
   {

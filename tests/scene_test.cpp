@@ -18,13 +18,10 @@ TEST_CASE("Scene test.", "[scene]")
   auto entity_3 = scene.add_entity();
   REQUIRE(entity_1->scene () == &scene);
   REQUIRE(entity_1->id    () == 0     );
-  REQUIRE(entity_1->bitset() == 0     ); 
   REQUIRE(entity_2->scene () == &scene);
   REQUIRE(entity_2->id    () == 1     );
-  REQUIRE(entity_2->bitset() == 0     );
   REQUIRE(entity_3->scene () == &scene);
   REQUIRE(entity_3->id    () == 2     );
-  REQUIRE(entity_3->bitset() == 0     );
 
   // scene::entities.
   auto entities_1 = scene.entities();
