@@ -5,7 +5,6 @@
 #include <bitset>
 #include <functional>
 
-#include <boost/functional/hash.hpp>
 #include <boost/mp11.hpp>
 
 #include <ec/scene.hpp>
