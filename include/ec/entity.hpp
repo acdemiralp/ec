@@ -1,8 +1,8 @@
 #ifndef EC_ENTITY_HPP_
 #define EC_ENTITY_HPP_
 
-#include <cstddef>
 #include <bitset>
+#include <cstddef>
 #include <functional>
 #include <stdexcept>
 #include <tuple>
@@ -25,10 +25,10 @@ public:
 
   explicit entity   (scene_type* scene) : scene_(scene)
   {
-    if (!scene) throw std::runtime_error("Scene cannot be null.");
+    if (!scene_) throw std::runtime_error("Scene cannot be nullptr.");
 
-    static std::size_t next_id = 0;
-    id_ = next_id++;
+    static std::size_t id = 0;
+    id_ = id++;
   }
   entity            (const entity&  that) = delete ;
   entity            (      entity&& temp) = default;
@@ -57,26 +57,11 @@ public:
     return bitset_;
   }
   
-  template<typename... required_types>
-  bool                           has_components  () const
-  {
-    using required_component_types   = boost::mp11::mp_list<required_types...>;
-    using required_component_size    = boost::mp11::mp_size<required_component_types>;
-    using required_component_indices = boost::mp11::mp_iota_c<required_component_size::value>;
-
-    auto valid = true;
-    boost::mp11::mp_for_each<required_component_indices>([&](const auto index)
-    {
-      using component_index = boost::mp11::mp_find<component_types, boost::mp11::mp_at_c<required_component_types, index>>;
-      if (!bitset_[component_index::value])
-        valid = false;
-    });
-    return valid;
-  }
   template<typename type, typename... argument_types>
   type*                          add_component   (argument_types&&... arguments)
   {
-    bitset_[boost::mp11::mp_find<component_types, type>::value] = true;
+    static_assert (boost::mp11::mp_contains<component_types, type>::value, "Type does not exist in component_types.");
+    bitset_       [boost::mp11::mp_find    <component_types, type>::value] = true;
     auto& component = std::get<std::optional<type>>(scene_->table_.at(*this));
     component.emplace(arguments...);
     return &component.value();
@@ -84,13 +69,15 @@ public:
   template<typename type>
   void                           remove_component()
   {
-    bitset_[boost::mp11::mp_find<component_types, type>::value] = false;
+    static_assert (boost::mp11::mp_contains<component_types, type>::value, "Type does not exist in component_types.");
+    bitset_       [boost::mp11::mp_find    <component_types, type>::value] = false;
     std::get<std::optional<type>>(scene_->table_.at(*this)).reset();
   }
   template<typename type>
   type*                          component       () const
   {
-    return bitset_[boost::mp11::mp_find<component_types, type>::value] ? &std::get<std::optional<type>>(scene_->table_.at(*this)).value() : nullptr;
+    static_assert (boost::mp11::mp_contains<component_types, type>::value, "Type does not exist in component_types.");
+    return bitset_[boost::mp11::mp_find    <component_types, type>::value] ? &std::get<std::optional<type>>(scene_->table_.at(*this)).value() : nullptr;
   }
   template<typename... required_types>
   std::tuple<required_types*...> components      () const
@@ -102,10 +89,28 @@ public:
     std::tuple<required_types*...> components;
     boost::mp11::mp_for_each<required_component_indices>([&] (const auto index)
     {
-      using component_index = boost::mp11::mp_find<component_types, boost::mp11::mp_at_c<required_component_types, index>>;
+      static_assert          (boost::mp11::mp_contains<component_types, boost::mp11::mp_at_c<required_component_types, index>>::value, "Type does not exist in component_types.");
+      using component_index = boost::mp11::mp_find    <component_types, boost::mp11::mp_at_c<required_component_types, index>>;
       std::get<index>(components) = bitset_[component_index::value] ? &std::get<component_index::value>(scene_->table_.at(*this)).value() : nullptr;
     });
     return components;
+  }
+  template<typename... required_types>
+  bool                           has_components  () const 
+  {
+    using required_component_types   = boost::mp11::mp_list<required_types...>;
+    using required_component_size    = boost::mp11::mp_size<required_component_types>;
+    using required_component_indices = boost::mp11::mp_iota_c<required_component_size::value>;
+
+    auto valid = true;
+    boost::mp11::mp_for_each<required_component_indices>([&](const auto index)
+    {
+      static_assert          (boost::mp11::mp_contains<component_types, boost::mp11::mp_at_c<required_component_types, index>>::value, "Type does not exist in component_types.");
+      using component_index = boost::mp11::mp_find    <component_types, boost::mp11::mp_at_c<required_component_types, index>>;
+      if (!bitset_[component_index::value])
+        valid = false;
+    });
+    return valid;
   }
 
 protected:
