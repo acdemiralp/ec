@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <bitset>
 #include <functional>
+#include <stdexcept>
+#include <tuple>
 
 #include <boost/functional/hash.hpp>
 #include <boost/mp11.hpp>
@@ -12,7 +14,6 @@
 
 namespace ec
 {
-// TODO: Improve compile-time type safety.
 template<typename... types>
 class entity
 {
@@ -24,6 +25,8 @@ public:
 
   explicit entity   (scene_type* scene) : scene_(scene)
   {
+    if (!scene) throw std::runtime_error("Scene cannot be null.");
+
     static std::size_t next_id = 0;
     id_ = next_id++;
   }
@@ -74,7 +77,7 @@ public:
   type*                          add_component   (argument_types&&... arguments)
   {
     bitset_[boost::mp11::mp_find<component_types, type>::value] = true;
-    auto& component = std::get<std::optional<type>>(scene_->entities_.at(*this));
+    auto& component = std::get<std::optional<type>>(scene_->table_.at(*this));
     component.emplace(arguments...);
     return &component.value();
   }
@@ -82,15 +85,15 @@ public:
   void                           remove_component()
   {
     bitset_[boost::mp11::mp_find<component_types, type>::value] = false;
-    std::get<std::optional<type>>(scene_->entities_.at(*this)).reset();
+    std::get<std::optional<type>>(scene_->table_.at(*this)).reset();
   }
   template<typename type>
-  type*                          get_component   () const
+  type*                          component       () const
   {
-    return bitset_[boost::mp11::mp_find<component_types, type>::value] ? &std::get<std::optional<type>>(scene_->entities_.at(*this)).value() : nullptr;
+    return bitset_[boost::mp11::mp_find<component_types, type>::value] ? &std::get<std::optional<type>>(scene_->table_.at(*this)).value() : nullptr;
   }
   template<typename... required_types>
-  std::tuple<required_types*...> get_components  () const
+  std::tuple<required_types*...> components      () const
   {
     using required_component_types   = boost::mp11::mp_list<required_types...>;
     using required_component_size    = boost::mp11::mp_size<required_component_types>;
@@ -100,7 +103,7 @@ public:
     boost::mp11::mp_for_each<required_component_indices>([&] (const auto index)
     {
       using component_index = boost::mp11::mp_find<component_types, boost::mp11::mp_at_c<required_component_types, index>>;
-      std::get<index>(components) = bitset_[component_index::value] ? &std::get<component_index::value>(scene_->entities_.at(*this)).value() : nullptr;
+      std::get<index>(components) = bitset_[component_index::value] ? &std::get<component_index::value>(scene_->table_.at(*this)).value() : nullptr;
     });
     return components;
   }

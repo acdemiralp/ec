@@ -78,25 +78,25 @@ TEST_CASE("Scene test.", "[scene]")
   REQUIRE(compound_has_components_3);
   REQUIRE(compound_has_components_4);
 
-  // entity::get_component.
-  REQUIRE( entity_1->get_component<std::string>() == component_1);
-  REQUIRE( entity_2->get_component<std::string>() == component_2);
-  REQUIRE( entity_2->get_component<int>        () == component_3);
-  REQUIRE( entity_3->get_component<std::string>() == component_4);
-  REQUIRE( entity_3->get_component<int>        () == component_5);
-  REQUIRE( entity_3->get_component<float>      () == component_6);
-  REQUIRE(*entity_1->get_component<std::string>() == "Entity 1" );
-  REQUIRE(*entity_2->get_component<std::string>() == "Entity 2" );
-  REQUIRE(*entity_2->get_component<int>        () == 2          );
-  REQUIRE(*entity_3->get_component<std::string>() == "Entity 3" );
-  REQUIRE(*entity_3->get_component<int>        () == 3          );
-  REQUIRE(*entity_3->get_component<float>      () == 3.0F       );
+  // entity::component.
+  REQUIRE( entity_1->component<std::string>() == component_1);
+  REQUIRE( entity_2->component<std::string>() == component_2);
+  REQUIRE( entity_2->component<int>        () == component_3);
+  REQUIRE( entity_3->component<std::string>() == component_4);
+  REQUIRE( entity_3->component<int>        () == component_5);
+  REQUIRE( entity_3->component<float>      () == component_6);
+  REQUIRE(*entity_1->component<std::string>() == "Entity 1" );
+  REQUIRE(*entity_2->component<std::string>() == "Entity 2" );
+  REQUIRE(*entity_2->component<int>        () == 2          );
+  REQUIRE(*entity_3->component<std::string>() == "Entity 3" );
+  REQUIRE(*entity_3->component<int>        () == 3          );
+  REQUIRE(*entity_3->component<float>      () == 3.0F       );
 
-  // entity::get_components.
-  auto compound_components_1 = entity_2->get_components<std::string, int>();
-  auto compound_components_2 = entity_2->get_components<int, std::string>();
-  auto compound_components_3 = entity_3->get_components<std::string, int, float>();
-  auto compound_components_4 = entity_3->get_components<float, int, std::string>();
+  // entity::components.
+  auto compound_components_1 = entity_2->components<std::string, int>();
+  auto compound_components_2 = entity_2->components<int, std::string>();
+  auto compound_components_3 = entity_3->components<std::string, int, float>();
+  auto compound_components_4 = entity_3->components<float, int, std::string>();
   REQUIRE(*std::get<0>(compound_components_1) == "Entity 2");
   REQUIRE(*std::get<1>(compound_components_1) == 2         );
   REQUIRE(*std::get<0>(compound_components_2) == 2         );
@@ -149,24 +149,24 @@ TEST_CASE("Scene test.", "[scene]")
   REQUIRE(entities_7.size() == 2);
   REQUIRE(entities_8.size() == 0);
   
-  // entity::get_component.
-  REQUIRE( entity_1->get_component<std::string>() == component_1);
-  REQUIRE( entity_2->get_component<std::string>() == component_2);
-  REQUIRE( entity_2->get_component<int>        () == component_3);
-  REQUIRE( entity_3->get_component<std::string>() == component_4);
-  REQUIRE( entity_3->get_component<int>        () == component_5);
-  REQUIRE(!entity_3->get_component<float>      ()               );
-  REQUIRE(*entity_1->get_component<std::string>() == "Entity 1" );
-  REQUIRE(*entity_2->get_component<std::string>() == "Entity 2" );
-  REQUIRE(*entity_2->get_component<int>        () == 2          );
-  REQUIRE(*entity_3->get_component<std::string>() == "Entity 3" );
-  REQUIRE(*entity_3->get_component<int>        () == 3          );
+  // entity::component.
+  REQUIRE( entity_1->component<std::string>() == component_1);
+  REQUIRE( entity_2->component<std::string>() == component_2);
+  REQUIRE( entity_2->component<int>        () == component_3);
+  REQUIRE( entity_3->component<std::string>() == component_4);
+  REQUIRE( entity_3->component<int>        () == component_5);
+  REQUIRE(!entity_3->component<float>      ()               );
+  REQUIRE(*entity_1->component<std::string>() == "Entity 1" );
+  REQUIRE(*entity_2->component<std::string>() == "Entity 2" );
+  REQUIRE(*entity_2->component<int>        () == 2          );
+  REQUIRE(*entity_3->component<std::string>() == "Entity 3" );
+  REQUIRE(*entity_3->component<int>        () == 3          );
 
-  // entity::get_components.
-  compound_components_1 = entity_2->get_components<std::string, int>();
-  compound_components_2 = entity_2->get_components<int, std::string>();
-  compound_components_3 = entity_3->get_components<std::string, int, float>();
-  compound_components_4 = entity_3->get_components<float, int, std::string>();
+  // entity::components.
+  compound_components_1 = entity_2->components<std::string, int>();
+  compound_components_2 = entity_2->components<int, std::string>();
+  compound_components_3 = entity_3->components<std::string, int, float>();
+  compound_components_4 = entity_3->components<float, int, std::string>();
   REQUIRE(*std::get<0>(compound_components_1) == "Entity 2");
   REQUIRE(*std::get<1>(compound_components_1) == 2         );
   REQUIRE(*std::get<0>(compound_components_2) == 2         );

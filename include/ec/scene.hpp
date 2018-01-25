@@ -23,16 +23,16 @@ public:
 
   entity_type*              add_entity   ()
   {
-    return const_cast<entity_type*>(&entities_.emplace(entity_type(this), components_type()).first->first);
+    return const_cast<entity_type*>(&table_.emplace(entity_type(this), components_type()).first->first);
   }
   void                      remove_entity(const entity_type* entity)
   {
-    entities_.erase(*entity);
+    table_.erase(*entity);
   }
   std::vector<entity_type*> entities     () const
   {
     std::vector<entity_type*> entities;
-    std::transform(entities_.begin(), entities_.end(), std::back_inserter(entities), [ ] (const auto& iteratee)
+    std::transform(table_.begin(), table_.end(), std::back_inserter(entities), [ ] (const auto& iteratee)
     {
       return const_cast<entity_type*>(&iteratee.first);
     });
@@ -42,7 +42,7 @@ public:
   std::vector<entity_type*> entities     () const
   {
     std::vector<entity_type*> entities;
-    std::for_each(entities_.begin(), entities_.end(), [&entities] (const auto& iteratee)
+    std::for_each(table_.begin(), table_.end(), [&entities] (const auto& iteratee)
     {
       if(iteratee.first.has_components<required_types...>())
         entities.push_back(const_cast<entity_type*>(&iteratee.first));
@@ -53,7 +53,7 @@ public:
 protected:
   friend entity<types...>;
 
-  std::unordered_map<entity_type, components_type> entities_;
+  std::unordered_map<entity_type, components_type> table_;
 };
 }
 
