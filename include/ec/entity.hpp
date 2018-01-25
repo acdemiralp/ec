@@ -12,6 +12,7 @@
 
 namespace ec
 {
+// TODO: Improve compile-time type safety.
 template<typename... types>
 class entity
 {
@@ -72,23 +73,21 @@ public:
   template<typename type, typename... argument_types>
   type*                          add_component   (argument_types&&... arguments)
   {
-    using component_index = boost::mp11::mp_find<component_types, type>;
-    bitset_[component_index::value] = true;
-    auto& component = std::get<std::optional<type>>(scene_->entities_.at(*this));
+    bitset_[boost::mp11::mp_find<component_types, type>::value] = true;
+    auto& component = std::get<std::optional<type>>(scene_->entities_[*this]);
     component.emplace(arguments...);
     return &component.value();
   }
   template<typename type>
   void                           remove_component()
   {
-    using component_index = boost::mp11::mp_find<component_types, type>;
-    bitset_[component_index::value] = false;
-    std::get<type>(scene_->entities_[*this]).reset();
+    bitset_[boost::mp11::mp_find<component_types, type>::value] = false;
+    std::get<std::optional<type>>(scene_->entities_[*this]).reset();
   }
   template<typename type>
   type*                          get_component   () const
   {
-    return &std::get<type>(scene_->entities_[*this]).value();
+    return bitset_[boost::mp11::mp_find<component_types, type>::value] ? &std::get<std::optional<type>>(scene_->entities_[*this]).value() : nullptr;
   }
   template<typename... required_types>
   std::tuple<required_types*...> get_components  () const
@@ -98,9 +97,10 @@ public:
     using required_component_indices = boost::mp11::mp_iota_c<required_component_size::value>;
     
     std::tuple<required_types*...> components;
-    boost::mp11::mp_for_each<required_component_indices>([&](const auto index)
+    boost::mp11::mp_for_each<required_component_indices>([&] (const auto index)
     {
       using component_index = boost::mp11::mp_find<component_types, boost::mp11::mp_at_c<required_component_types, index>>;
+      std::get<index>(components) = bitset_[component_index::value] ? &std::get<component_index::value>(scene_->entities_[*this]).value() : nullptr;
     });
     return components;
   }
@@ -119,11 +119,7 @@ struct hash<ec::entity<types...>>
 {
   size_t operator() (const ec::entity<types...>& that) const
   {
-    size_t seed = 0;
-    boost::hash_combine(seed, hash<typename ec::entity<types...>::scene_type*>{}(that.scene ()));
-    boost::hash_combine(seed, hash<size_t>                                    {}(that.id    ()));
-    //boost::hash_combine(seed, hash<typename ec::entity<types...>::bitset_type>{}(that.bitset()));
-    return seed;
+    return hash<size_t>{}(that.id());
   }
 };
 }

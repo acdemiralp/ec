@@ -12,6 +12,7 @@ namespace ec
 template<typename... types>
 class entity;
 
+// TODO: RAII entity handles.
 template<typename type>
 class scene;
 template<typename... types>
@@ -23,7 +24,7 @@ public:
 
   entity_type*             add_entity   ()
   {
-    return &entities_.emplace(entity_type(this), components_type()).first->first;
+    return const_cast<entity_type*>(&entities_.emplace(entity_type(this), components_type()).first->first);
   }
   void                     remove_entity(const entity_type* entity)
   {
