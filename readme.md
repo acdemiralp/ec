@@ -13,8 +13,7 @@ Example:
 | "sun"     | null           | null         | null   | null   | null     | {...} | null  | {...}     |
 | "player"  | {...}          | null         | null   | {...}  | {...}    | null  | {...} | {...}     |
 | "ui"      | null           | null         | {...}  | null   | {...}    | null  | null  | {...}     |
-&nbsp;
-
+  
 **What is an entity?**  
 Simply a handle referring to a row in an ec-table.
 
