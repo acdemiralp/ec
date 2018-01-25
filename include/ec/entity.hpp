@@ -40,21 +40,21 @@ public:
     return id_ != that.id_;
   }
 
-  scene_type*        scene            () const
+  scene_type*                    scene           () const
   {
     return scene_;
   }
-  const std::size_t& id               () const
+  const std::size_t&             id              () const
   {
     return id_;
   }
-  const bitset_type& components_bitset() const
+  const bitset_type&             bitset          () const
   {
-    return components_bitset_;
+    return bitset_;
   }
 
   template<typename... required_types>
-  bool               has_components   () const
+  bool                           has_components  () const
   {
     using required_component_types   = boost::mp11::mp_list<required_types...>;
     using required_component_size    = boost::mp11::mp_size<required_component_types>;
@@ -64,23 +64,51 @@ public:
     boost::mp11::mp_for_each<required_component_indices>([&](const auto index)
     {
       using component_index = boost::mp11::mp_find<component_types, boost::mp11::mp_at_c<required_component_types, index>>;
-      if (!components_bitset_[component_index::value])
+      if (!bitset_[component_index::value])
         valid = false;
     });
     return valid;
   }
-
-  /*
-  - Component
-  - Create         (entity)
-  - Delete         (entity)
-  - Get            (entity)
-  */
+  template<typename type, typename... argument_types>
+  type*                          add_component   (argument_types&&... arguments)
+  {
+    using component_index = boost::mp11::mp_find<component_types, type>;
+    bitset_[component_index::value] = true;
+    auto& component = std::get<std::optional<type>>(scene_->entities_.at(*this));
+    component.emplace(arguments...);
+    return &component.value();
+  }
+  template<typename type>
+  void                           remove_component()
+  {
+    using component_index = boost::mp11::mp_find<component_types, type>;
+    bitset_[component_index::value] = false;
+    std::get<type>(scene_->entities_[*this]).reset();
+  }
+  template<typename type>
+  type*                          get_component   () const
+  {
+    return &std::get<type>(scene_->entities_[*this]).value();
+  }
+  template<typename... required_types>
+  std::tuple<required_types*...> get_components  () const
+  {
+    using required_component_types   = boost::mp11::mp_list<required_types...>;
+    using required_component_size    = boost::mp11::mp_size<required_component_types>;
+    using required_component_indices = boost::mp11::mp_iota_c<required_component_size::value>;
+    
+    std::tuple<required_types*...> components;
+    boost::mp11::mp_for_each<required_component_indices>([&](const auto index)
+    {
+      using component_index = boost::mp11::mp_find<component_types, boost::mp11::mp_at_c<required_component_types, index>>;
+    });
+    return components;
+  }
 
 protected:
-  scene_type* scene_            ;
-  std::size_t id_               ;
-  bitset_type components_bitset_;
+  scene_type* scene_ ;
+  std::size_t id_    ;
+  bitset_type bitset_;
 };
 }
 
@@ -92,9 +120,9 @@ struct hash<ec::entity<types...>>
   size_t operator() (const ec::entity<types...>& that) const
   {
     size_t seed = 0;
-    boost::hash_combine(seed, hash<typename ec::entity<types...>::scene_type*>{}(that.scene            ()));
-    boost::hash_combine(seed, hash<size_t>                                    {}(that.id               ()));
-    boost::hash_combine(seed, hash<typename ec::entity<types...>::bitset_type>{}(that.components_bitset()));
+    boost::hash_combine(seed, hash<typename ec::entity<types...>::scene_type*>{}(that.scene ()));
+    boost::hash_combine(seed, hash<size_t>                                    {}(that.id    ()));
+    //boost::hash_combine(seed, hash<typename ec::entity<types...>::bitset_type>{}(that.bitset()));
     return seed;
   }
 };

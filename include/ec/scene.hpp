@@ -21,13 +21,13 @@ public:
   using entity_type     = entity<types...>;
   using components_type = std::tuple<std::optional<types>...>;
 
-  entity_type              add_entity   ()
+  entity_type*             add_entity   ()
   {
-    return entities_.emplace(entity_type(this), components_type()).first->first;
+    return &entities_.emplace(entity_type(this), components_type()).first->first;
   }
-  void                     remove_entity(const entity_type& entity)
+  void                     remove_entity(const entity_type* entity)
   {
-    entities_.erase(entity);
+    entities_.erase(*entity);
   }
   std::vector<entity_type> entities     () const
   {
