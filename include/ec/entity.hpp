@@ -5,6 +5,7 @@
 #include <bitset>
 #include <functional>
 
+#include <boost/functional/hash.hpp>
 #include <boost/mp11.hpp>
 
 #include <ec/scene.hpp>
@@ -33,11 +34,11 @@ public:
   entity& operator= (      entity&& temp) = default;
   bool    operator==(const entity&  that) const
   {
-    return id_ == that.id_;
+    return scene_ == that.scene_ && id_ == that.id_;
   }
   bool    operator!=(const entity&  that) const
   {
-    return id_ != that.id_;
+    return scene_ != that.scene_ || id_ != that.id_;
   }
 
   scene_type*                    scene           () const
@@ -47,6 +48,10 @@ public:
   const std::size_t&             id              () const
   {
     return id_;
+  }
+  const bitset_type&             bitset          () const
+  {
+    return bitset_;
   }
   
   template<typename... required_types>
@@ -114,7 +119,10 @@ struct hash<ec::entity<types...>>
 {
   size_t operator() (const ec::entity<types...>& that) const
   {
-    return hash<size_t>{}(that.id());
+    size_t seed;
+    boost::hash_combine(seed, hash<typename ec::entity<types...>::scene_type*>{}(that.scene ()));
+    boost::hash_combine(seed, hash<size_t>                                    {}(that.id    ()));
+    return seed;
   }
 };
 }
