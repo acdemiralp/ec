@@ -33,7 +33,7 @@ TEST_CASE("Scene test.", "[scene]")
   REQUIRE(entities_1[1] == *entity_2);
   REQUIRE(entities_1[2] == *entity_3);
 
-  // scene::entities<required_types...>.
+  // scene::entities<>.
   auto entities_2 = scene.entities<std::string>            ();
   auto entities_3 = scene.entities<int>                    ();
   auto entities_4 = scene.entities<float>                  ();
@@ -49,7 +49,7 @@ TEST_CASE("Scene test.", "[scene]")
   REQUIRE(entities_7.size() == 0);
   REQUIRE(entities_8.size() == 0);
 
-  // entity::has_components<required_types...>.
+  // entity::has_components.
   REQUIRE(!entity_1->has_components<std::string>());
   REQUIRE(!entity_2->has_components<std::string>());
   REQUIRE(!entity_2->has_components<int>        ());
@@ -57,7 +57,7 @@ TEST_CASE("Scene test.", "[scene]")
   REQUIRE(!entity_3->has_components<int>        ());
   REQUIRE(!entity_3->has_components<float>      ());
 
-  // entity::add_component<type, argument_types...> and entity::has_components<required_types...>.
+  // entity::add_component and entity::has_components.
   auto component_1 = entity_1->add_component<std::string>("Entity 1");
   auto component_2 = entity_2->add_component<std::string>("Entity 2");
   auto component_3 = entity_2->add_component<int>        (2);
@@ -71,7 +71,7 @@ TEST_CASE("Scene test.", "[scene]")
   REQUIRE(entity_3->has_components<int>        ());
   REQUIRE(entity_3->has_components<float>      ());
   
-  // entity::has_components<required_types...>.
+  // entity::has_components.
   auto compound_has_components_1 = entity_2->has_components<std::string, int>();
   auto compound_has_components_2 = entity_2->has_components<int, std::string>();
   auto compound_has_components_3 = entity_3->has_components<std::string, int, float>();
@@ -111,7 +111,7 @@ TEST_CASE("Scene test.", "[scene]")
   REQUIRE(*std::get<1>(compound_components_4) == 3         );
   REQUIRE(*std::get<2>(compound_components_4) == "Entity 3");
 
-  // scene::entities<required_types...>.
+  // scene::entities<>.
   entities_2 = scene.entities<std::string>            ();
   entities_3 = scene.entities<int>                    ();
   entities_4 = scene.entities<float>                  ();
@@ -127,7 +127,7 @@ TEST_CASE("Scene test.", "[scene]")
   REQUIRE(entities_7.size() == 2);
   REQUIRE(entities_8.size() == 1);
 
-  // entity::remove_component and entity::has_components<required_types...>.
+  // entity::remove_component and entity::has_components.
   entity_3->remove_component<float>();
   REQUIRE( entity_1->has_components<std::string>());
   REQUIRE( entity_2->has_components<std::string>());
@@ -136,7 +136,7 @@ TEST_CASE("Scene test.", "[scene]")
   REQUIRE( entity_3->has_components<int>        ());
   REQUIRE(!entity_3->has_components<float>      ());
 
-  // scene::entities<required_types...>.
+  // scene::entities<>.
   entities_2 = scene.entities<std::string>            ();
   entities_3 = scene.entities<int>                    ();
   entities_4 = scene.entities<float>                  ();
