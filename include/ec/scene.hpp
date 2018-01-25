@@ -12,7 +12,6 @@ namespace ec
 template<typename... types>
 class entity;
 
-// TODO: RAII entity handles.
 template<typename type>
 class scene;
 template<typename... types>
@@ -22,31 +21,31 @@ public:
   using entity_type     = entity<types...>;
   using components_type = std::tuple<std::optional<types>...>;
 
-  entity_type*             add_entity   ()
+  entity_type*              add_entity   ()
   {
     return const_cast<entity_type*>(&entities_.emplace(entity_type(this), components_type()).first->first);
   }
-  void                     remove_entity(const entity_type* entity)
+  void                      remove_entity(const entity_type* entity)
   {
     entities_.erase(*entity);
   }
-  std::vector<entity_type> entities     () const
+  std::vector<entity_type*> entities     () const
   {
-    std::vector<entity_type> entities;
+    std::vector<entity_type*> entities;
     std::transform(entities_.begin(), entities_.end(), std::back_inserter(entities), [ ] (const auto& iteratee)
     {
-      return iteratee.first;
+      return const_cast<entity_type*>(&iteratee.first);
     });
     return entities;
   }
   template<typename... required_types>
-  std::vector<entity_type> entities     () const
+  std::vector<entity_type*> entities     () const
   {
-    std::vector<entity_type> entities;
+    std::vector<entity_type*> entities;
     std::for_each(entities_.begin(), entities_.end(), [&entities] (const auto& iteratee)
     {
       if(iteratee.first.has_components<required_types...>())
-        entities.push_back(iteratee.first);
+        entities.push_back(const_cast<entity_type*>(&iteratee.first));
     });
     return entities;
   }

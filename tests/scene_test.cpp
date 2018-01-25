@@ -26,9 +26,9 @@ TEST_CASE("Scene test.", "[scene]")
   // scene::entities.
   auto entities_1 = scene.entities();
   REQUIRE(entities_1.size() == 3);
-  REQUIRE(entities_1[0] == *entity_1);
-  REQUIRE(entities_1[1] == *entity_2);
-  REQUIRE(entities_1[2] == *entity_3);
+  REQUIRE(entities_1[0] == entity_1);
+  REQUIRE(entities_1[1] == entity_2);
+  REQUIRE(entities_1[2] == entity_3);
 
   // scene::entities<>.
   auto entities_2 = scene.entities<std::string>            ();
@@ -182,6 +182,6 @@ TEST_CASE("Scene test.", "[scene]")
   scene.remove_entity(entity_3);
   entities_1 = scene.entities();
   REQUIRE(entities_1.size() == 2);
-  REQUIRE(entities_1[0] == *entity_1);
-  REQUIRE(entities_1[1] == *entity_2);
+  REQUIRE(entities_1[0] == entity_1);
+  REQUIRE(entities_1[1] == entity_2);
 }
