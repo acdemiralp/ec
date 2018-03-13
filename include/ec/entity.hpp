@@ -30,10 +30,10 @@ public:
     static std::size_t id = 0;
     id_ = id++;
   }
-  entity            (const entity&  that) = delete ;
+  entity            (const entity&  that) = default;
   entity            (      entity&& temp) = default;
   virtual ~entity   ()                    = default;
-  entity& operator= (const entity&  that) = delete ;
+  entity& operator= (const entity&  that) = default;
   entity& operator= (      entity&& temp) = default;
   bool    operator==(const entity&  that) const
   {
