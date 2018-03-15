@@ -49,7 +49,11 @@ public:
     });
     return entities;
   }
-
+  
+  void                      insert       (const entity_type* entity)
+  {
+    table_.emplace(entity_type(this, entity->bitset()), entity->scene()->table_.at(*entity));
+  }
   void                      clear        ()
   {
     table_.clear();
