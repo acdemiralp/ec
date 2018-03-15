@@ -20,15 +20,30 @@ class scene<entity<types...>>
 public:
   using entity_type     = entity<types...>;
   using components_type = std::tuple<std::optional<types>...>;
-
+  
+  void                      append       (const scene& that)
+  {
+    for (auto& entry : that.table_)
+      table_.emplace(entity_type(this, entry.first.bitset()), entry.second);
+  }
+  void                      clear        ()
+  {
+    table_.clear();
+  }
+ 
   entity_type*              add_entity   ()
   {
     return const_cast<entity_type*>(&table_.emplace(entity_type(this), components_type()).first->first);
+  }
+  entity_type*              copy_entity  (const entity_type* entity)
+  {
+    return const_cast<entity_type*>(&table_.emplace(entity_type(this, entity->bitset()), entity->scene()->table_.at(*entity)).first->first);
   }
   void                      remove_entity(const entity_type* entity)
   {
     table_.erase(*entity);
   }
+   
   std::vector<entity_type*> entities     () const
   {
     std::vector<entity_type*> entities;
@@ -50,20 +65,6 @@ public:
     return entities;
   }
   
-  void                      insert       (const entity_type* entity)
-  {
-    table_.emplace(entity_type(this, entity->bitset()), entity->scene()->table_.at(*entity));
-  }
-  void                      insert       (const scene&       that  )
-  {
-    for (auto& entry : that.table_)
-      table_.emplace(entity_type(this, entry.first.bitset()), entry.second);
-  }
-  void                      clear        ()
-  {
-    table_.clear();
-  }
-
 protected:
   friend entity<types...>;
 
