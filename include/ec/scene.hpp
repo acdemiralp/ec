@@ -54,6 +54,11 @@ public:
   {
     table_.emplace(entity_type(this, entity->bitset()), entity->scene()->table_.at(*entity));
   }
+  void                      insert       (const scene&       that  )
+  {
+    for (auto& entry : that.table_)
+      table_.emplace(entity_type(this, entry.first.bitset()), entry.second);
+  }
   void                      clear        ()
   {
     table_.clear();
