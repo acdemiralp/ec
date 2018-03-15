@@ -50,6 +50,11 @@ public:
     return entities;
   }
 
+  void                      clear        ()
+  {
+    table_.clear();
+  }
+
 protected:
   friend entity<types...>;
 
