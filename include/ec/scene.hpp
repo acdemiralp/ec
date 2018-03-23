@@ -24,7 +24,7 @@ public:
   void                      append       (const scene& that)
   {
     for (auto& entry : that.table_)
-      table_.emplace(entity_type(this, entry.first.bitset()), entry.second);
+      table_.emplace(entity_type(next_id_++, this, entry.first.bitset()), entry.second);
   }
   void                      clear        ()
   {
@@ -33,11 +33,11 @@ public:
  
   entity_type*              add_entity   ()
   {
-    return const_cast<entity_type*>(&table_.emplace(entity_type(this), components_type()).first->first);
+    return const_cast<entity_type*>(&table_.emplace(entity_type(next_id_++, this), components_type()).first->first);
   }
   entity_type*              copy_entity  (const entity_type* entity)
   {
-    return const_cast<entity_type*>(&table_.emplace(entity_type(this, entity->bitset()), entity->scene()->table_.at(*entity)).first->first);
+    return const_cast<entity_type*>(&table_.emplace(entity_type(next_id_++, this, entity->bitset()), entity->scene()->table_.at(*entity)).first->first);
   }
   void                      remove_entity(const entity_type* entity)
   {
@@ -68,7 +68,8 @@ public:
 protected:
   friend entity<types...>;
 
-  std::unordered_map<entity_type, components_type> table_;
+  std::unordered_map<entity_type, components_type> table_   ;
+  std::size_t                                      next_id_ = 0;
 };
 }
 

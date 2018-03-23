@@ -23,7 +23,7 @@ public:
   using bitset_type     = std::bitset<component_count::value>;
   using scene_type      = scene<entity<types...>>;
 
-  explicit entity   (scene_type* scene, bitset_type bitset = bitset_type()) : id_(create_id()), scene_(scene), bitset_(bitset)
+  explicit entity   (std::size_t id, scene_type* scene, bitset_type bitset = bitset_type()) : id_(id), scene_(scene), bitset_(bitset)
   {
     if (!scene_) throw std::runtime_error("Scene cannot be nullptr.");
   }
@@ -111,12 +111,6 @@ public:
   }
 
 protected:
-  static std::size_t create_id()
-  {
-    static std::size_t id = 0;
-    return id++;
-  }
-  
   std::size_t id_    ;
   scene_type* scene_ ;
   bitset_type bitset_;
