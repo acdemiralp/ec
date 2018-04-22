@@ -4,7 +4,7 @@ import os
 
 class EcConan(ConanFile):
     name            = "ec"
-    version         = "1.2.0"                     
+    version         = "1.2.1"                     
     description     = "Conan package for ec."           
     url             = "https://github.com/acdemiralp/ec"
     license         = "MIT"							
