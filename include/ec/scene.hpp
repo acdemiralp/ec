@@ -21,7 +21,7 @@ public:
   using entity_type     = entity<types...>;
   using components_type = std::tuple<std::optional<types>...>;
   
-  void                      append       (const scene& that)
+  std::vector<entity_type*> append       (const scene& that)
   {
     std::vector<entity_type*> entities;
     for (auto& entry : that.table_)
