@@ -23,8 +23,10 @@ public:
   
   void                      append       (const scene& that)
   {
+    std::vector<entity_type*> entities;
     for (auto& entry : that.table_)
-      table_.emplace(entity_type(next_id_++, this, entry.first.bitset()), entry.second);
+      entities.push_back(const_cast<entity_type*>(&table_.emplace(entity_type(next_id_++, this, entry.first.bitset()), entry.second).first->first));
+    return entities;
   }
   void                      clear        ()
   {
