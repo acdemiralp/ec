@@ -124,7 +124,7 @@ struct hash<ec::entity<types...>>
 {
   size_t operator() (const ec::entity<types...>& that) const
   {
-    size_t seed;
+    size_t seed = 0;
     boost::hash_combine(seed, hash<typename ec::entity<types...>::scene_type*>{}(that.scene ()));
     boost::hash_combine(seed, hash<size_t>                                    {}(that.id    ()));
     return seed;
